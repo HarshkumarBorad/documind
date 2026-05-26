@@ -18,9 +18,15 @@ python scripts/ingest_samples.py --skip-if-populated || {
 }
 
 echo "==> Starting Streamlit on port 7860..."
+# --enableXsrfProtection / --enableCORS disabled because HF Spaces reverse-proxies
+# the connection — Streamlit's XSRF cookie doesn't round-trip cleanly, so file
+# uploads fail with 403 without these flags. Safe for a public demo; revisit if
+# you ever add auth / sensitive mutations.
 exec streamlit run ui/app.py \
     --server.port 7860 \
     --server.address 0.0.0.0 \
     --server.headless true \
     --browser.gatherUsageStats false \
-    --server.fileWatcherType none
+    --server.fileWatcherType none \
+    --server.enableXsrfProtection false \
+    --server.enableCORS false
