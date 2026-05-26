@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ChromaDB persistence (when running outside docker)
+chroma_data/
+
+# Logs
+*.log
+logs/
+
+# User-supplied documents in docs/ are NOT committed — they may be third-party
+# (arXiv papers, customer docs, etc.) or personal (CVs, contracts). Only the
+# .md sample documents that ship with the repo are tracked.
+docs/**/*.pdf
+docs/**/*.docx
+docs/**/*.doc
+docs/**/*.odt

@@ -1,0 +1,65 @@
+services:
+  chromadb:
+    image: chromadb/chroma:0.5.20
+    container_name: documind-chromadb
+    ports:
+      - "${CHROMA_PORT:-8000}:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      IS_PERSISTENT: "TRUE"
+      PERSIST_DIRECTORY: /chroma/chroma
+      ANONYMIZED_TELEMETRY: "FALSE"
+    restart: unless-stopped
+
+  api:
+    build: .
+    container_name: documind-api
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    environment:
+      # Container DNS — override the .env's localhost for in-network lookup.
+      CHROMA_HOST: chromadb
+    depends_on:
+      - chromadb
+    volumes:
+      # Mount sample docs read-only so /ingest with `path: /app/docs/hr` works.
+      - ./docs:/app/docs:ro
+    restart: unless-stopped
+
+  ui:
+    build: .
+    container_name: documind-ui
+    command: >
+      streamlit run ui/app.py
+      --server.address=0.0.0.0
+      --server.port=8501
+      --server.headless=true
+      --browser.gatherUsageStats=false
+    ports:
+      - "8501:8501"
+    environment:
+      DOCUMIND_API_URL: http://api:8001
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  mcp:
+    build: .
+    container_name: documind-mcp
+    command: python -m mcp_server.server --transport http --host 0.0.0.0 --port 8002
+    ports:
+      - "8002:8002"
+    env_file:
+      - .env
+    environment:
+      CHROMA_HOST: chromadb
+    depends_on:
+      - chromadb
+    restart: unless-stopped
+
+volumes:
+  chroma_data:

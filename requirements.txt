@@ -1,0 +1,37 @@
+# Phase 1 — vector store + config
+chromadb-client>=0.5.20,<0.6
+pydantic-settings>=2.5.0,<3
+
+# Phase 2 — ingestion (loaders, chunkers, embedder)
+huggingface_hub>=0.24.0,<1
+langchain-core>=0.3.0,<0.4
+langchain-community>=0.3.0,<0.4
+langchain-text-splitters>=0.3.0,<0.4
+langchain-experimental>=0.3.0,<0.4
+pypdf>=4.0.0,<6
+docx2txt>=0.8
+beautifulsoup4>=4.12.0,<5
+lxml>=5.0.0,<6
+
+# Phase 3 — LangGraph orchestration
+langgraph>=0.2.0,<0.4
+
+# Phase 4 — cross-encoder reranker (pulls torch + transformers, ~2 GB install)
+sentence-transformers>=3.0.0,<5
+
+# Phase 5 — REST API
+fastapi>=0.115.0,<0.120.0
+# uvicorn 0.34+ — FastMCP 2.13 requires the `websockets-sansio` protocol added in 0.34.
+uvicorn[standard]>=0.34.0,<1.0.0
+
+# Phase 6 — MCP server (bridge to multi-agent project)
+fastmcp>=2.0.0,<3
+
+# Phase 7 — Streamlit UI
+streamlit>=1.40.0,<2
+requests>=2.31.0,<3
+
+# Phase 8 — RAGAS evaluation
+ragas>=0.2.0,<0.4
+datasets>=3.0.0,<5
+pandas>=2.0.0,<3

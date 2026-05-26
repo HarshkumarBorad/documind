@@ -1,0 +1,19 @@
+[theme]
+# Indigo-violet primary — modern, professional, tech-feeling.
+primaryColor = "#6366f1"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f8fafc"
+textColor = "#0f172a"
+font = "sans serif"
+base = "light"
+
+[server]
+# Friendly defaults for a local demo.
+headless = false
+runOnSave = true
+
+[browser]
+gatherUsageStats = false
+
+[ui]
+hideTopBar = false

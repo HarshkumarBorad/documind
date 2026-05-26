@@ -1,0 +1,58 @@
+{
+  "hr": [
+    {
+      "question": "What is the leave policy?",
+      "ground_truth": "Full-time employees are entitled to 30 working days of paid annual leave per calendar year, with up to 5 unused days carried over into the following year (must be taken by 31 March)."
+    },
+    {
+      "question": "How many sick days are employees entitled to per year?",
+      "ground_truth": "Employees are entitled to paid sick leave for up to 6 weeks at full pay per illness. A medical certificate is required from day 3 onwards. Beyond 6 weeks, statutory sickness benefits (Krankengeld) apply."
+    },
+    {
+      "question": "What is the procedure for reporting workplace harassment?",
+      "ground_truth": "Reports can be made through your manager or skip-level manager, your HR partner, the anonymous ethics hotline, or the works council (Betriebsrat). All reports are investigated and retaliation against reporters is itself a serious violation."
+    }
+  ],
+  "tech": [
+    {
+      "question": "How do I authenticate API requests?",
+      "ground_truth": "All requests require a Bearer token in the Authorization header. API keys are issued from the Aurora Console under Account → API Keys, are scoped per project, and can be rotated or revoked at any time."
+    },
+    {
+      "question": "What is the rate limit for the public API?",
+      "ground_truth": "Free tier: 60 requests per minute and 10,000 requests per day. Pro tier: 600 requests per minute with no daily cap. Enterprise tier: custom limits. Exceeding the limit returns 429 with a Retry-After header."
+    },
+    {
+      "question": "Which Python version is required to run the SDK?",
+      "ground_truth": "Python 3.10 or higher."
+    }
+  ],
+  "research": [
+    {
+      "question": "What is retrieval-augmented generation (RAG)?",
+      "ground_truth": "RAG combines a parametric language model with a non-parametric retrieval index. Given a query, relevant documents are retrieved and conditioned on by the generator to produce a more grounded, factual answer than the language model would generate alone."
+    },
+    {
+      "question": "How does cross-encoder reranking improve retrieval quality?",
+      "ground_truth": "Cross-encoders score (query, passage) pairs jointly with full attention, allowing finer-grained relevance judgments than the bi-encoder cosine similarity used at retrieval time. They are too slow to run over the full corpus, so they are typically used to re-rank the top-N bi-encoder retrieval hits."
+    },
+    {
+      "question": "What are the trade-offs between bi-encoder and cross-encoder models?",
+      "ground_truth": "Bi-encoders embed queries and passages independently into a shared vector space, enabling fast pre-computed vector search but losing direct query-passage interaction. Cross-encoders process query and passage together with full attention, capturing richer relevance signals at the cost of being unable to pre-compute embeddings and being much slower per pair."
+    }
+  ],
+  "product": [
+    {
+      "question": "How do I install the product on Windows?",
+      "ground_truth": "Download AuroraDesktop-Setup.exe from downloads.aurora.example, right-click and select Run as administrator, follow the prompts and accept the default install location (C:\\Program Files\\Aurora), then launch from the Start menu and sign in."
+    },
+    {
+      "question": "What's new in the latest release?",
+      "ground_truth": "v1.4.0 introduces a multi-project switcher, named job templates, and dark mode. It also improves cold start time from 2.1s to 0.9s, reduces memory usage during job monitoring by ~35%, and fixes a 4 GB+ upload crash on Windows."
+    },
+    {
+      "question": "How do I troubleshoot connection errors?",
+      "ground_truth": "Check your firewall and ensure HTTPS access to api.aurora.example on port 443 is allowed. Corporate proxies may need configuration in Settings → Network. If the issue persists, check the service status page at status.aurora.example."
+    }
+  ]
+}
