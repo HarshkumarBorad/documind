@@ -460,6 +460,27 @@ with tab_status:
                     help=f"Chunks indexed in `{d}`",
                 )
 
+        st.divider()
+        st.markdown("#### Environment")
+        env_cols = st.columns(3)
+        for col, key, label in zip(
+            env_cols,
+            ["HF_TOKEN", "HF_EMBED_MODEL", "HF_LLM_MODEL"],
+            ["HF_TOKEN", "Embedding model", "LLM model"],
+        ):
+            with col:
+                val = os.environ.get(key, "")
+                if key == "HF_TOKEN":
+                    is_set = bool(val.strip())
+                    indicator = "🟢 set" if is_set else "🔴 not set"
+                    st.metric(label, indicator)
+                    if not is_set:
+                        st.caption(
+                            "Add as a Space secret in Settings → Variables and secrets, then restart the Space."
+                        )
+                else:
+                    st.metric(label, val or "—")
+
 
 # ----- Evaluation tab -----------------------------------------------------
 
