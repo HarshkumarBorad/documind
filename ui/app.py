@@ -10,13 +10,22 @@ from __future__ import annotations
 
 import os
 import pathlib
+import sys
 import tempfile
+from pathlib import Path
 
-import pandas as pd
-import streamlit as st
+# Streamlit only puts the script's directory (ui/) on sys.path. In API mode
+# that's fine — we only import sibling modules. In LOCAL mode the UI imports
+# `vectorstore`, `ingestion`, `rag_pipeline` etc. which live at the project
+# root — so prepend the project root to sys.path before any project imports.
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
-# Streamlit puts the script's directory on sys.path (not the project root),
-# so these resolve to files sitting next to this one.
+import pandas as pd  # noqa: E402
+import streamlit as st  # noqa: E402
+
+# Sibling modules inside ui/ — found via Streamlit's default script-dir entry.
 from api_client import APIClient, APIError  # noqa: E402
 from styles import DOMAIN_STYLES, GLOBAL_CSS, domain_badge_html, domain_label  # noqa: E402
 
