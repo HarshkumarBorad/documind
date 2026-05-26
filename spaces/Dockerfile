@@ -15,9 +15,12 @@ FROM python:3.11-slim
 RUN useradd -m -u 1000 user
 
 # Build tools needed by some Python wheels (lxml, sentence-transformers, etc.).
+# `git` is required at runtime by ragas → gitpython, which probes for the
+# binary on import even when no git operations are actually performed.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         curl \
+        git \
     && rm -rf /var/lib/apt/lists/*
 
 USER user
@@ -41,7 +44,8 @@ ENV DOCUMIND_MODE=local \
     CHROMA_MODE=persistent \
     CHROMA_PERSIST_PATH=/home/user/app/chroma_data \
     PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
+    PYTHONDONTWRITEBYTECODE=1 \
+    GIT_PYTHON_REFRESH=quiet
 
 RUN chmod +x entrypoint.sh
 
