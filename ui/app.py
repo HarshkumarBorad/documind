@@ -8,6 +8,7 @@ Requires the FastAPI backend (Phase 5) to be running on http://localhost:8001
 """
 from __future__ import annotations
 
+import os
 import pathlib
 import tempfile
 
@@ -18,6 +19,10 @@ import streamlit as st
 # so these resolve to files sitting next to this one.
 from api_client import APIClient, APIError  # noqa: E402
 from styles import DOMAIN_STYLES, GLOBAL_CSS, domain_badge_html, domain_label  # noqa: E402
+
+# DOCUMIND_MODE=local — call the graph directly in-process (HF Spaces, single-container deploys).
+# DOCUMIND_MODE=api / unset — talk to the FastAPI backend (default: docker-compose deploys).
+_LOCAL_MODE = os.environ.get("DOCUMIND_MODE", "api").lower() == "local"
 
 DOMAINS = list(DOMAIN_STYLES.keys())
 
@@ -31,10 +36,16 @@ st.set_page_config(
 st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
 
 
-def get_client() -> APIClient:
-    # APIClient is dirt-cheap to construct — caching it across reruns just hides
-    # class changes from Streamlit's auto-reload (silently AttributeErrors on
-    # new methods until you click Clear Cache). Not worth caching.
+def get_client():
+    """Returns either an HTTP APIClient or an in-process LocalClient.
+
+    Switched by the DOCUMIND_MODE env var. Not cached on purpose — caching
+    hides class changes from Streamlit's auto-reload (AttributeErrors on
+    new methods until you click Clear Cache).
+    """
+    if _LOCAL_MODE:
+        from local_client import LocalClient  # local import — only needed in this mode
+        return LocalClient()
     return APIClient()
 
 

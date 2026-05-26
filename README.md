@@ -246,6 +246,15 @@ Services:
 
 ---
 
+## ☁️ Deploy to HuggingFace Spaces
+
+A pre-configured single-container variant lives under [`spaces/`](spaces/) —
+embedded ChromaDB, Streamlit talking to the graph in-process, no FastAPI or
+MCP services. Step-by-step deployment guide: [`spaces/DEPLOY.md`](spaces/DEPLOY.md).
+
+This is what you'd link to a recruiter as a live demo URL — free hosting, no
+ongoing cost, recognized AI portfolio venue.
+
 ## 💻 Run locally (per-service)
 
 Useful for development with auto-reload.

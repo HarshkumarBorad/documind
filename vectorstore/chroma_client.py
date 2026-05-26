@@ -55,21 +55,50 @@ class ChromaConfig(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    # "http"       — talk to a ChromaDB server (the docker-compose path, default).
+    # "persistent" — embed ChromaDB in-process with on-disk persistence. Used by
+    #                deployments where you can't run a separate Chroma service
+    #                (e.g. HuggingFace Spaces — one container per Space).
+    chroma_mode: str = "http"
     chroma_host: str = "localhost"
     chroma_port: int = 8000
+    chroma_persist_path: str = "/data/chroma"
     documind_namespace_prefix: str = "documind"
 
 
+def _build_client(config: ChromaConfig):
+    """Pick the right ChromaDB client based on mode."""
+    settings = Settings(anonymized_telemetry=False)
+
+    if config.chroma_mode == "persistent":
+        # PersistentClient lives in the full `chromadb` package, not in `chromadb-client`.
+        # If you're seeing AttributeError here, swap chromadb-client → chromadb in requirements.
+        try:
+            return chromadb.PersistentClient(path=config.chroma_persist_path, settings=settings)
+        except AttributeError as exc:
+            raise RuntimeError(
+                "CHROMA_MODE=persistent requires the full `chromadb` package. "
+                "Replace `chromadb-client` with `chromadb` in requirements.txt."
+            ) from exc
+
+    if config.chroma_mode != "http":
+        raise ValueError(
+            f"CHROMA_MODE must be 'http' or 'persistent'; got {config.chroma_mode!r}"
+        )
+
+    return chromadb.HttpClient(
+        host=config.chroma_host,
+        port=config.chroma_port,
+        settings=settings,
+    )
+
+
 class NamespaceManager:
-    """Thin wrapper around the Chroma HTTP client that enforces one collection per domain."""
+    """Thin wrapper that enforces one collection per domain, regardless of client mode."""
 
     def __init__(self, config: ChromaConfig | None = None) -> None:
         self.config = config or ChromaConfig()
-        self.client = chromadb.HttpClient(
-            host=self.config.chroma_host,
-            port=self.config.chroma_port,
-            settings=Settings(anonymized_telemetry=False),
-        )
+        self.client = _build_client(self.config)
 
     def collection_name(self, domain: Domain) -> str:
         return f"{self.config.documind_namespace_prefix}_{domain.value}"
@@ -100,7 +129,15 @@ class NamespaceManager:
         return [c.name for c in self.client.list_collections()]
 
     def heartbeat(self) -> int:
-        """Returns the server's nanosecond heartbeat — raises if unreachable."""
+        """Returns the server's nanosecond heartbeat — raises if unreachable.
+
+        For persistent (embedded) mode there is no remote server, so we
+        synthesise a heartbeat from a cheap local call.
+        """
+        if self.config.chroma_mode == "persistent":
+            # Any cheap operation proves the client is functional.
+            self.client.list_collections()
+            return 0
         return self.client.heartbeat()
 
 

@@ -37,11 +37,22 @@ def main() -> int:
         action="store_true",
         help="Wipe each namespace before ingesting.",
     )
+    parser.add_argument(
+        "--skip-if-populated",
+        action="store_true",
+        help="Skip any namespace that already has chunks. Useful in deploy entrypoints "
+        "to avoid re-embedding on every container wake-up.",
+    )
     args = parser.parse_args()
 
     if not DOCS_ROOT.is_dir():
         print(f"ERROR: docs/ directory not found at {DOCS_ROOT}", file=sys.stderr)
         return 1
+
+    # Lazy import so this script can also be invoked just for its help text.
+    from vectorstore import get_manager
+
+    manager = get_manager() if args.skip_if_populated else None
 
     total = 0
     for domain in Domain:
@@ -52,6 +63,12 @@ def main() -> int:
         if not _has_ingestible_files(path):
             print(f"  [skip] {domain.value}: no supported files in {path}")
             continue
+
+        if args.skip_if_populated and manager is not None:
+            existing = manager.get_or_create(domain).count()
+            if existing > 0:
+                print(f"  [skip] {domain.value}: already has {existing} chunk(s)")
+                continue
 
         print(f"\n=== Ingesting {domain.value} from {path} ===")
         try:
